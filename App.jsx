@@ -528,10 +528,25 @@ export default function App() {
             <select
               value={selectedGalaxy}
               onChange={(e) => {
-                const val = e.target.value;
-                setSelectedGalaxy(val);
-                setSelectedStar("");
-                setSelectedOrbitId(null);
+                const galaxy = e.target.value;
+                  setSelectedGalaxy(galaxy);
+
+                  const stars = Object.keys(
+                    hierarchy?.[selectedEntity]?.tenants?.[selectedTenant]?.galaxies?.[galaxy]
+                      ?.stars || {}
+                  ).sort();
+                  const star = stars[0] || "";
+                  setSelectedStar(star);
+
+                  let firstOrbitId = null;
+                  if (star) {
+                    const starObj =
+                      hierarchy[selectedEntity].tenants[selectedTenant].galaxies[galaxy].stars[
+                        star
+                      ];
+                    firstOrbitId = Object.values(starObj.orbits || {})[0]?.id ?? null;
+                  }
+                  setSelectedOrbitId(firstOrbitId);
               }}
               disabled={!galaxyNames.length}
             >
@@ -551,8 +566,19 @@ export default function App() {
             <select
               value={selectedStar}
               onChange={(e) => {
-                setSelectedStar(e.target.value);
-                setSelectedOrbitId(null);
+                const star = e.target.value;
+                setSelectedStar(star);
+
+                let firstOrbitId = null;
+                if (star) {
+                  const starObj =
+                    hierarchy?.[selectedEntity]?.tenants?.[selectedTenant]?.galaxies?.[
+                      selectedGalaxy
+                    ]?.stars?.[star];
+
+                  firstOrbitId = Object.values(starObj?.orbits || {})[0]?.id ?? null;
+                }
+                setSelectedOrbitId(firstOrbitId);
               }}
               disabled={!starNames.length}
             >
